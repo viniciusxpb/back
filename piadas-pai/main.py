@@ -5,4 +5,4 @@ app = FastAPI()
 
 @app.get("/")
 async def raiz():
-    return JSONResponse(content={"message": "Hello, Vance. API no ar, sarcasmo ativado."})
+    return JSONResponse(content={"message": "Oi Mozão, ta bem?"})
