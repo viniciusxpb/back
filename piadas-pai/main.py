@@ -1,16 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-import openai
-import os
+from openai import OpenAI
 
-# Substitua pela sua chave da OpenAI
-api_key = os.getenv("OPENAI_API_KEY")
-if api_key:
-    openai.api_key = api_key
-else:
-    print("⚠️ Chave da OpenAI não encontrada. Endpoints de IA vão falhar.")
+client = OpenAI(
+    api_key=""
+)
 
-    
 app = FastAPI(
     title="Joker API",
     description="API que responde piadas e trauma, igual sua ex.",
@@ -19,22 +14,22 @@ app = FastAPI(
 
 @app.get("/")
 async def raiz():
-    return JSONResponse(content={"message": "Oi Mozão, ta bem?"})
+    return JSONResponse(content={"message": "Morgana Rules"})
 
 @app.get("/piada")
-async def piada():
+async def piada(topico: str = Query("aleatório", description="Tópico da piada")):
     try:
-        resposta = openai.ChatCompletion.create(
+        prompt = f"Me conta uma piada boa, curta e criativa sobre o tema: {topico}."
+
+        resposta = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": "Me conta uma piada boa e curta."}
-            ],
-            temperature=0.7,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.8,
             max_tokens=50
         )
 
         piada = resposta.choices[0].message.content.strip()
-        return JSONResponse(content={"piada": piada})
+        return JSONResponse(content={"topico": topico, "piada": piada})
 
     except Exception as e:
         return JSONResponse(content={"erro": str(e)}, status_code=500)
