@@ -1,15 +1,15 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
-load_dotenv()  # carrega o .env
+load_dotenv()  # carrega .env localmente
 
 api_key = os.getenv("OPENAI_API_KEY")
 
 if not api_key:
-    raise RuntimeError("⚠️ Chave da OpenAI não encontrada no .env!")
+    raise RuntimeError("❌ Chave da OpenAI não encontrada. O palhaço morreu antes de contar a piada. Verifica o .env ou configura no Render, campeão.")
 
 client = OpenAI(api_key=api_key)
 
@@ -39,4 +39,4 @@ async def piada(topico: str = "aleatório"):
         return JSONResponse(content={"piada": piada})
 
     except Exception as e:
-        return JSONResponse(content={"erro": str(e)}, status_code=500)
+        return JSONResponse(content={"erro": f"💀 Erro ao gerar piada: {str(e)}"}, status_code=500)
