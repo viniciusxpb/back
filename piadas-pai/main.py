@@ -1,10 +1,17 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
-client = OpenAI(
-    api_key=""
-)
+load_dotenv()  # carrega o .env
+
+api_key = os.getenv("OPENAI_API_KEY")
+
+if not api_key:
+    raise RuntimeError("⚠️ Chave da OpenAI não encontrada no .env!")
+
+client = OpenAI(api_key=api_key)
 
 app = FastAPI(
     title="Joker API",
@@ -17,7 +24,7 @@ async def raiz():
     return JSONResponse(content={"message": "Morgana Rules"})
 
 @app.get("/piada")
-async def piada(topico: str = Query("aleatório", description="Tópico da piada")):
+async def piada(topico: str = "aleatório"):
     try:
         prompt = f"Me conta uma piada boa, curta e criativa sobre o tema: {topico}."
 
@@ -29,7 +36,7 @@ async def piada(topico: str = Query("aleatório", description="Tópico da piada"
         )
 
         piada = resposta.choices[0].message.content.strip()
-        return JSONResponse(content={"topico": topico, "piada": piada})
+        return JSONResponse(content={"piada": piada})
 
     except Exception as e:
         return JSONResponse(content={"erro": str(e)}, status_code=500)
