@@ -2,10 +2,13 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 
-load_dotenv()  # carrega .env localmente
+# Carrega .env (só tem efeito localmente)
+load_dotenv()
 
+# Pega a chave da OpenAI (Render usa variável de ambiente)
 api_key = os.getenv("OPENAI_API_KEY")
 
 if not api_key:
@@ -13,10 +16,20 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
+# Inicializa a API
 app = FastAPI(
     title="Joker API",
     description="API que responde piadas e trauma, igual sua ex.",
     version="1.0.0"
+)
+
+# Libera CORS pro GitHub Pages
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://viniciusxpb.github.io"],  # coloca seu domínio aqui
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
